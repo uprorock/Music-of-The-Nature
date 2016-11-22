@@ -413,6 +413,7 @@ SET(OPENAL_OBJS  OpenAL32/alAuxEffectSlot.c
                  OpenAL32/alSource.c
                  OpenAL32/alState.c
                  OpenAL32/alThunk.c
+
 )
 SET(ALC_OBJS  Alc/ALc.c
               Alc/ALu.c
@@ -431,6 +432,7 @@ SET(ALC_OBJS  Alc/ALc.c
               # Default backends, always available
               Alc/backends/loopback.c
               Alc/backends/null.c
+              Alc/OAL.c
 )
 
 SET(BACKENDS "")

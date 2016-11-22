@@ -25,6 +25,7 @@ android {
     externalNativeBuild {
         cmake {
             path "OpenAL/CMakeLists.txt"
+
         }
     }
 }

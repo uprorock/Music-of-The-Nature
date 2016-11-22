@@ -9,11 +9,8 @@ import static java.lang.System.loadLibrary;
 public class OAL {
     static {
         loadLibrary("openal");
-    }
-    public native int alGet(int what);
 
-    int Java_com_uprorock_openal_alGet(int what) {
-        return alGet(what);
     }
-
+    public native String stringFromJNI();
+    public native int play(String filename);
 }
