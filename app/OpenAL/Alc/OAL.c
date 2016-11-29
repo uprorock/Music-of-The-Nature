@@ -12,9 +12,10 @@
 
 
 JNIEXPORT jstring JNICALL
-Java_com_example_prorock_musicofnature_OAL_stringFromJNI(JNIEnv *env, jobject instance) {
+Java_com_example_prorock_musicofnature_OAL_stringFromJNI
+        (JNIEnv *env, jobject instance) {
 
-    return (*env)->NewStringUTF(env, "HELLO BITCH!!!");
+    return (*env)->NewStringUTF(env, "HELLO !!");
 }
 
 typedef struct {
@@ -37,7 +38,7 @@ typedef struct {
 char* readWAV(char* filename,BasicWAVEHeader* header){
     char* buffer = 0;
 
-    FILE* file = fopen(filename,"rb");
+    FILE* file = fopen(filename,"rd");
 
     if (!file) {
         return 0;

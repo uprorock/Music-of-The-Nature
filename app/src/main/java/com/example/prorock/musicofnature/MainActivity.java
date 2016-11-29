@@ -3,8 +3,10 @@ package com.example.prorock.musicofnature;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 
 import java.io.File;
 import android.media.MediaPlayer;
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,11 +29,12 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("openal");
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-/*
+
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -46,46 +50,19 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
 
-
-            // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-            // app-defined int constant. The callback method gets the
-            // result of the request.
         }
-*/
+
         test = new OAL();
         String extStore = Environment.getExternalStorageDirectory().getAbsolutePath();
-
-        String sdpath,sd1path,usbdiskpath,sd0path;
-        sdpath = sd1path = usbdiskpath = sd0path = null;
-
-        if(new File("/storage/extSdCard/").exists())
-        {
-            sdpath="/storage/extSdCard/";
-            Log.i("Sd Cardext Path",sdpath);
-        }
-        if(new File("/storage/sdcard1/").exists()) // exists
-        {
-            sd1path="/storage/sdcard1/";
-            Log.i("Sd Card1 Path",sd1path);
-        }
-        if(new File("/storage/usbcard1/").exists())
-        {
-            usbdiskpath="/storage/usbcard1/";
-            Log.i("USB Path",usbdiskpath);
-        }
-        if(new File("/storage/sdcard0/").exists()) // exists
-        {
-            sd0path="/storage/sdcard0/";
-            Log.i("Sd Card0 Path",sd0path);
-        }
-
 /*
         String filePath = Environment.getExternalStorageDirectory().toString() + "/EarthQuake.wav";
         MediaPlayer mp = MediaPlayer.create(this, Uri.parse(filePath));
         mp.start();
-*/
-/*
-        String path = Environment.getExternalStorageDirectory().toString()+"/Pictures";
+
+
+        File[] externalStorage = getExternalFilesDirs(null);
+
+        String path = externalStorage[1].getPath().toString();
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
         File[] files = directory.listFiles();
@@ -96,9 +73,9 @@ public class MainActivity extends AppCompatActivity {
         }
 */
         String filePath = Environment.getExternalStorageDirectory().toString() + "/EarthQuake.wav";
-        //int indicator = test.play(filePath);
+        int indicator = test.play(filePath);
         // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(test.stringFromJNI());
+         tv.setText(test.stringFromJNI());
     }
 }
