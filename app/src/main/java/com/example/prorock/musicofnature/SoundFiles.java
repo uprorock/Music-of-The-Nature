@@ -60,23 +60,22 @@ class SoundFiles extends AsyncTask<Void, Void, Void> {
         if (!coreDir.exists()) {
             coreDir.mkdir();
         }
-        else {
-            File[] localFileList = coreDir.listFiles();
-            FTPFile[] ftpFileList = connectionFTP.listFiles();
-            // Проверяем и создаем корневые папки
-            compareLocalWithRemoteFolder(localFolderPath, ftpFileList);
 
-            // Проходим по каждой папке
-            // TODO: Сделать разные функции для папок и для файлов
-            for (FTPFile localDir : ftpFileList) {
-                compareLocalWithRemoteFolder(localFolderPath + File.separator + localDir.getName(),
-                        connectionFTP.listFiles(localDir.getName()));
-            }
+        File[] localFileList = coreDir.listFiles();
+        FTPFile[] ftpFileList = connectionFTP.listFiles();
+        // Проверяем и создаем корневые папки
+        compareLocalWithRemoteFolder(localFolderPath, ftpFileList, null);
 
+        // Проходим по каждой папке
+        // TODO: Сделать разные функции для папок и для файлов
+        //connectionFTP.setFileType(FTPClient.BINARY_FILE_TYPE);
+        for (FTPFile localDir : ftpFileList) {
+            compareLocalWithRemoteFolder(localFolderPath + File.separator + localDir.getName(),
+                    connectionFTP.listFiles(localDir.getName()), localDir.getName());
         }
     }
 
-    private void compareLocalWithRemoteFolder(String localFolderPath, FTPFile[] ftpFileList) throws IOException {
+    private void compareLocalWithRemoteFolder(String localFolderPath, FTPFile[] ftpFileList, String remoteFolderName) throws IOException {
         if (ftpFileList != null && ftpFileList.length > 0) {
             for (FTPFile ftpfile : ftpFileList) {
                 if (ftpfile.isDirectory()) {
@@ -84,11 +83,12 @@ class SoundFiles extends AsyncTask<Void, Void, Void> {
                     if (!localDir.exists())
                         localDir.mkdir();
                 }
-                else if (ftpfile.isFile()) {
-                    OutputStream output;
-                    output = new FileOutputStream(ftpfile.getName());
+                else if (ftpfile.isFile()) { // TODO: Проверять еще нужно на наличие файла И на его совпадение с версией на сервере
+                    FileOutputStream output;
+                    File targetFile = new File(localFolderPath + File.separator + ftpfile.getName());
+                    output = new FileOutputStream(targetFile);
                     //get the file from the remote system
-                    connectionFTP.retrieveFile(ftpfile.getName(), output);
+                    connectionFTP.retrieveFile(File.separator + remoteFolderName + File.separator + ftpfile.getName(), output);
                     //close output stream
                     output.close();
                 }
