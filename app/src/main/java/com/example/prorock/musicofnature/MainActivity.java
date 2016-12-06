@@ -1,6 +1,7 @@
 package com.example.prorock.musicofnature;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -23,13 +24,14 @@ public class MainActivity extends AppCompatActivity {
     OAL test;
     int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 0;
     int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
+    int MY_PERMISSIONS_REQUEST_INTERNET = 0;
 
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("openal");
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +42,14 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
+                Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED
+                ) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.INTERNET},
+                    MY_PERMISSIONS_REQUEST_INTERNET);
 
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
@@ -52,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+        new SoundFiles(this).execute();
+        //SoundFiles soundOnSDcard = new SoundFiles(getApplicationContext());
+/*
         test = new OAL();
         String extStore = Environment.getExternalStorageDirectory().getAbsolutePath();
 /*
@@ -71,11 +83,14 @@ public class MainActivity extends AppCompatActivity {
         {
             Log.d("Files", "FileName:" + files[i].getName());
         }
-*/
+
         String filePath = Environment.getExternalStorageDirectory().toString() + "/EarthQuake.wav";
         int indicator = test.play(filePath);
         // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.sample_text);
          tv.setText(test.stringFromJNI());
+*/
     }
+
+    private void requestPermissions() {}
 }

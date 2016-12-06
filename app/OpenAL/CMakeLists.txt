@@ -432,7 +432,8 @@ SET(ALC_OBJS  Alc/ALc.c
               # Default backends, always available
               Alc/backends/loopback.c
               Alc/backends/null.c
-              Alc/OAL.c
+              # OAL interface
+              OAL.c
 )
 
 SET(BACKENDS "")
