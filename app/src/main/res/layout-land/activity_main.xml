@@ -15,24 +15,4 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!" />
-
-    <Button
-        android:text="Sync"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:onClick="onSyncButtonClicked"
-        android:id="@+id/button_sync" />
-
-    <Button
-        android:text="Play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button_sync"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="150dp"
-        android:onClick="onPlayButtonClicked"
-        android:id="@+id/button_play" />
 </RelativeLayout>

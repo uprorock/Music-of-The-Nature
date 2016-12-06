@@ -19,7 +19,7 @@ import java.io.OutputStream;
 
 import static android.os.Environment.MEDIA_UNKNOWN;
 
-class SoundFiles extends AsyncTask<Void, Void, Void> {
+class SyncFiles extends AsyncTask<Void, Void, Void> {
     private FTPClient connectionFTP;
     private String serverFTPaddress = "soundofnature.ucoz.net";
     private String loginFTPServer = "esoundofnature";
@@ -28,7 +28,7 @@ class SoundFiles extends AsyncTask<Void, Void, Void> {
     private Context mainContext;
 
 
-    SoundFiles(Context appContext) {
+    SyncFiles(Context appContext) {
         mainContext = appContext;
     }
 
@@ -61,29 +61,25 @@ class SoundFiles extends AsyncTask<Void, Void, Void> {
             coreDir.mkdir();
         }
 
-        File[] localFileList = coreDir.listFiles();
         FTPFile[] ftpFileList = connectionFTP.listFiles();
         // Проверяем и создаем корневые папки
-        compareLocalWithRemoteFolder(localFolderPath, ftpFileList, null);
+        compareLocalWithRemoteFolders(localFolderPath, ftpFileList);
 
         // Проходим по каждой папке
-        // TODO: Сделать разные функции для папок и для файлов
         //connectionFTP.setFileType(FTPClient.BINARY_FILE_TYPE);
         for (FTPFile localDir : ftpFileList) {
-            compareLocalWithRemoteFolder(localFolderPath + File.separator + localDir.getName(),
-                    connectionFTP.listFiles(localDir.getName()), localDir.getName());
+            compareLocalWithRemoteFiles(connectionFTP.listFiles(localDir.getName()),
+                    localFolderPath + File.separator + localDir.getName(), localDir.getName());
         }
     }
 
-    private void compareLocalWithRemoteFolder(String localFolderPath, FTPFile[] ftpFileList, String remoteFolderName) throws IOException {
+    private void compareLocalWithRemoteFiles(FTPFile[] ftpFileList, String localFolderPath,
+                                             String remoteFolderName) throws IOException {
         if (ftpFileList != null && ftpFileList.length > 0) {
             for (FTPFile ftpfile : ftpFileList) {
-                if (ftpfile.isDirectory()) {
-                    File localDir = new File(localFolderPath + File.separator + ftpfile.getName());
-                    if (!localDir.exists())
-                        localDir.mkdir();
-                }
-                else if (ftpfile.isFile()) { // TODO: Проверять еще нужно на наличие файла И на его совпадение с версией на сервере
+                if (ftpfile.isFile()) { // TODO: Проверять еще нужно на наличие файла И
+                                        // TODO: на его совпадение с версией на сервере
+                                        // TODO: И на то, если файл удален на сервере но есть на карте
                     FileOutputStream output;
                     File targetFile = new File(localFolderPath + File.separator + ftpfile.getName());
                     output = new FileOutputStream(targetFile);
@@ -91,6 +87,18 @@ class SoundFiles extends AsyncTask<Void, Void, Void> {
                     connectionFTP.retrieveFile(File.separator + remoteFolderName + File.separator + ftpfile.getName(), output);
                     //close output stream
                     output.close();
+                }
+            }
+        }
+    }
+
+    private void compareLocalWithRemoteFolders(String localFolderPath, FTPFile[] ftpFileList) throws IOException {
+        if (ftpFileList != null && ftpFileList.length > 0) {
+            for (FTPFile ftpDir : ftpFileList) {
+                if (ftpDir.isDirectory()) {
+                    File localDir = new File(localFolderPath + File.separator + ftpDir.getName());
+                    if (!localDir.exists())
+                        localDir.mkdir();
                 }
             }
         }

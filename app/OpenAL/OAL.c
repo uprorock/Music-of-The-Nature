@@ -136,9 +136,9 @@ Java_com_example_prorock_musicofnature_OAL_play(JNIEnv *env, jobject instance, j
     alDeleteBuffers(1, &buffer);
 
     // Cleaning up
-    alcMakeContextCurrent(0);
-    alcDestroyContext(context);
-    alcCloseDevice(device);
+    //alcMakeContextCurrent(0);
+    //alcDestroyContext(context);
+    //alcCloseDevice(device);
 
     return 0;
 

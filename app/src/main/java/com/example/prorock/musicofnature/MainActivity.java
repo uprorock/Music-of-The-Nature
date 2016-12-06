@@ -1,27 +1,27 @@
 package com.example.prorock.musicofnature;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.annotation.RequiresApi;
+import android.renderscript.Byte2;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.Button;
 
-import java.io.File;
-import android.media.MediaPlayer;
-import java.io.File;
+//TODO: Спросить разрешения при первом запуске и проверять в каждом запуске
+//TODO: Сделать внешний конф файл со структурой файловой системы
+//TODO: Синхронизация должна осуществляться при первом запуске
 
 public class MainActivity extends AppCompatActivity {
 
     OAL test;
+    Button syncButton;
+    Button playButton;
     int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 0;
     int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
     int MY_PERMISSIONS_REQUEST_INTERNET = 0;
@@ -36,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        syncButton = (Button)findViewById(R.id.button_sync);
+        playButton = (Button)findViewById(R.id.button_play);
 
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
@@ -61,13 +64,11 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        new SoundFiles(this).execute();
-        //SoundFiles soundOnSDcard = new SoundFiles(getApplicationContext());
 /*
         test = new OAL();
         String extStore = Environment.getExternalStorageDirectory().getAbsolutePath();
-/*
-        String filePath = Environment.getExternalStorageDirectory().toString() + "/EarthQuake.wav";
+
+        String filePath = Environment.getExternalStorageDirectory().toString() + "/NatureMusic/Sounds/bird.wav";
         MediaPlayer mp = MediaPlayer.create(this, Uri.parse(filePath));
         mp.start();
 
@@ -92,5 +93,27 @@ public class MainActivity extends AppCompatActivity {
 */
     }
 
-    private void requestPermissions() {}
+    public void onSyncButtonClicked(View v) {
+        new SyncFiles(this).execute();
+    }
+
+    public void onPlayButtonClicked(View v) {
+        /*
+        String filePath = Environment.getExternalStorageDirectory().toString() + "/NatureMusic/Sounds/bird.wav";
+        MediaPlayer mp = MediaPlayer.create(this, Uri.parse(filePath));
+        mp.start();
+        */
+        test = new OAL();
+        String filePath = Environment.getExternalStorageDirectory().toString() + "/NatureMusic/Sounds/bird.wav";
+        int indicator = test.play(filePath);
+    }
+
+
+    private void requestPermissions() {
+
+    }
+
+    private void pickRandomSounds() {
+
+    }
 }
