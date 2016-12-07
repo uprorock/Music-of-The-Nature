@@ -25,6 +25,7 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
     private String loginFTPServer = "esoundofnature";
     private String passwordFTPServer = "LCYE2sllrPoh";
     private boolean isConnectedToFTP = false;
+    private boolean isSyncedCorrectly = false;
     private Context mainContext;
 
 
@@ -58,7 +59,9 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
     private void SyncLocalFolderToFTP(String localFolderPath) throws IOException {
         File coreDir = new File(localFolderPath);
         if (!coreDir.exists()) {
-            coreDir.mkdir();
+            boolean state = coreDir.mkdirs();
+            if (state == false)
+                throw new IOException();
         }
 
         FTPFile[] ftpFileList = connectionFTP.listFiles();
@@ -71,6 +74,8 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
             compareLocalWithRemoteFiles(connectionFTP.listFiles(localDir.getName()),
                     localFolderPath + File.separator + localDir.getName(), localDir.getName());
         }
+
+        isSyncedCorrectly = true;
     }
 
     private void compareLocalWithRemoteFiles(FTPFile[] ftpFileList, String localFolderPath,
@@ -120,9 +125,11 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        if (isConnectedToFTP)
-            Toast.makeText(mainContext, "Sync complete!", Toast.LENGTH_SHORT).show();
-        else
+        if (!isSyncedCorrectly)
             Toast.makeText(mainContext, "Error with syncing!", Toast.LENGTH_SHORT).show();
+        else if (!isConnectedToFTP)
+            Toast.makeText(mainContext, "Error with connecting to server!", Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(mainContext, "Sync complete!", Toast.LENGTH_SHORT).show();
     }
 }

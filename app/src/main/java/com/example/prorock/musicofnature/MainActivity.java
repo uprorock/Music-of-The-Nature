@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         mp.start();
         */
         test = new OAL();
-        String filePath = Environment.getExternalStorageDirectory().toString() + "/NatureMusic/Sounds/bird.wav";
+        String filePath = Environment.getExternalStorageDirectory().toString() + "/NatureMusic/Sounds/bird_chirp.wav";
         int indicator = test.play(filePath);
     }
 
