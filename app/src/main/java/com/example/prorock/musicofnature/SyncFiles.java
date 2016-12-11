@@ -47,7 +47,7 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
     }
 
     private String getLocalFolderPath() {
-        String sdState = android.os.Environment.getExternalStorageState(); //Получаем состояние SD карты (подключена она или нет) - возвращается true и false соответственно
+        String sdState = android.os.Environment.getExternalStorageState(); //Получаем состояние SD карты (подключена она или нет)
         if (sdState.equals(android.os.Environment.MEDIA_MOUNTED)) {
             return Environment.getExternalStorageDirectory().toString();
         }
@@ -65,14 +65,15 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
         }
 
         FTPFile[] ftpFileList = connectionFTP.listFiles();
+        File[] localFileList = coreDir.listFiles();
         // Проверяем и создаем корневые папки
-        compareLocalWithRemoteFolders(localFolderPath, ftpFileList);
+        compareLocalWithRemoteFolders(localFolderPath, localFileList, ftpFileList);
 
         // Проходим по каждой папке
         //connectionFTP.setFileType(FTPClient.BINARY_FILE_TYPE);
-        for (FTPFile localDir : ftpFileList) {
-            compareLocalWithRemoteFiles(connectionFTP.listFiles(localDir.getName()),
-                    localFolderPath + File.separator + localDir.getName(), localDir.getName());
+        for (FTPFile remoteDir : ftpFileList) {
+            compareLocalWithRemoteFiles(connectionFTP.listFiles(remoteDir.getName()),
+                    localFolderPath + File.separator + remoteDir.getName(), remoteDir.getName());
         }
 
         isSyncedCorrectly = true;
@@ -82,11 +83,17 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
                                              String remoteFolderName) throws IOException {
         if (ftpFileList != null && ftpFileList.length > 0) {
             for (FTPFile ftpfile : ftpFileList) {
-                if (ftpfile.isFile()) { /* TODO: Проверять еще нужно на наличие файла и
-                                           на его совпадение с версией на сервере,
-                                           и на то, если файл удален на сервере но есть на карте */
-                    FileOutputStream output;
+                if (ftpfile.isFile()) {
                     File targetFile = new File(localFolderPath + File.separator + ftpfile.getName());
+                    if (targetFile.exists()) {
+                        //Compare remote and local file
+                        if (targetFile.length() != ftpfile.getSize()) {
+                            targetFile.delete();
+                        }
+                        else
+                            continue;
+                    }
+                    FileOutputStream output;
                     output = new FileOutputStream(targetFile);
                     //get the file from the remote system
                     connectionFTP.retrieveFile(File.separator + remoteFolderName + File.separator + ftpfile.getName(), output);
@@ -95,16 +102,38 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
                 }
             }
         }
+
+        //Checking files count on local and remote dirs
+        File[] localFileList = new File(localFolderPath).listFiles();
+        compareFilesCount(localFileList, ftpFileList);
     }
 
-    private void compareLocalWithRemoteFolders(String localFolderPath, FTPFile[] ftpFileList) throws IOException {
-        if (ftpFileList != null && ftpFileList.length > 0) {
-            for (FTPFile ftpDir : ftpFileList) {
+    private void compareLocalWithRemoteFolders(String localFolderPath, File[] localFoldersList, FTPFile[] ftpFoldersList) throws IOException {
+        if (ftpFoldersList != null && ftpFoldersList.length > 0) {
+            for (FTPFile ftpDir : ftpFoldersList) {
                 if (ftpDir.isDirectory()) {
                     File localDir = new File(localFolderPath + File.separator + ftpDir.getName());
                     if (!localDir.exists())
                         localDir.mkdir();
                 }
+            }
+        }
+        // Checking folders count on local and remote dirs
+        compareFilesCount(localFoldersList, ftpFoldersList);
+    }
+
+    private void compareFilesCount(File[] localFileList, FTPFile[] ftpFileList) {
+        if (ftpFileList.length != localFileList.length) {
+            for (File localFile : localFileList) {
+                boolean remoteFileExists = false;
+                for (FTPFile ftpFile: ftpFileList) {
+                    String localFileName = localFile.getName();
+                    String ftpFileName = ftpFile.getName();
+                    if (localFileName.equals(ftpFileName))
+                        remoteFileExists = true;
+                }
+                if (remoteFileExists == false)
+                    localFile.delete();
             }
         }
     }

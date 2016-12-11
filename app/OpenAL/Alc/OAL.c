@@ -10,6 +10,7 @@
 #include <AL/alc.h>
 #include <unistd.h>
 
+jboolean isCancelled = 0;
 
 JNIEXPORT jstring JNICALL
 Java_com_example_prorock_musicofnature_OAL_stringFromJNI
@@ -89,6 +90,7 @@ ALuint createBufferFromWave(char* data,BasicWAVEHeader header){
 JNIEXPORT jint JNICALL
 Java_com_example_prorock_musicofnature_OAL_play(JNIEnv *env, jobject instance, jstring filename) {
 
+    isCancelled = 0;
     // Global Variables
     ALCdevice* device = 0;
     ALCcontext* context = 0;
@@ -127,7 +129,7 @@ Java_com_example_prorock_musicofnature_OAL_play(JNIEnv *env, jobject instance, j
     int        sourceState = AL_PLAYING;
     do {
         alGetSourcei(source, AL_SOURCE_STATE, &sourceState);
-    } while(sourceState == AL_PLAYING);
+    } while(sourceState == AL_PLAYING && isCancelled != 1);
 
     // Release source
     alDeleteSources(1, &source);
@@ -142,4 +144,16 @@ Java_com_example_prorock_musicofnature_OAL_play(JNIEnv *env, jobject instance, j
 
     return 0;
 
+}
+
+JNIEXPORT jint JNICALL
+        Java_com_example_prorock_musicofnature_OAL_stop(JNIEnv *env, jobject instance) {
+    isCancelled = 1;
+    return 0;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_example_prorock_musicofnature_StopOAL_stop(JNIEnv *env, jobject instance) {
+    isCancelled = 1;
+    return 0;
 }
