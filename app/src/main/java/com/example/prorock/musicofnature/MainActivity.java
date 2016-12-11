@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onSyncButtonClicked(View v) {
+
         new SyncFiles(this).execute();
     }
 
@@ -105,7 +106,9 @@ public class MainActivity extends AppCompatActivity {
         */
         test = new OAL();
         String filePath = Environment.getExternalStorageDirectory().toString() + "/NatureMusic/Sounds/bird_chirp.wav";
-        int indicator = test.play(filePath);
+        String filePath2 = Environment.getExternalStorageDirectory().toString() + "/NatureMusic/Backgrounds/bird.wav";
+        int indicator = test.play(filePath2, filePath, null);
+
     }
 
 

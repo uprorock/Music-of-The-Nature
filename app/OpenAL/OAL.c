@@ -86,8 +86,26 @@ ALuint createBufferFromWave(char* data,BasicWAVEHeader header){
     return buffer;
 }
 
+int createBufferForWav(JNIEnv *env, ALuint *soundBuffer, jstring soundPath) {
+    const char* fnameptr = (*env)->GetStringUTFChars(env, soundPath, NULL);
+    BasicWAVEHeader header;
+    char* data = readWAV(fnameptr,&header);
+    if (data){
+        //Now We've Got A Wave In Memory, Time To Turn It Into A Usable Buffer
+        *soundBuffer = createBufferFromWave(data,header);
+        if (!*soundBuffer){
+            free(data);
+            return -1;
+        }
+
+    } else {
+        return -1;
+    }
+}
+
 JNIEXPORT jint JNICALL
-Java_com_example_prorock_musicofnature_OAL_play(JNIEnv *env, jobject instance, jstring filename) {
+Java_com_example_prorock_musicofnature_OAL_play(JNIEnv *env, jobject instance, jstring backgroundSound,
+                                                jstring sound1, jstring sound2) {
 
     // Global Variables
     ALCdevice* device = 0;
@@ -99,41 +117,36 @@ Java_com_example_prorock_musicofnature_OAL_play(JNIEnv *env, jobject instance, j
     context = alcCreateContext(device, context_attribs);
     alcMakeContextCurrent(context);
 
-    // Create audio buffer
-    ALuint buffer;
-    const char* fnameptr = (*env)->GetStringUTFChars(env, filename, NULL);
-    BasicWAVEHeader header;
-    char* data = readWAV(fnameptr,&header);
-    if (data){
-        //Now We've Got A Wave In Memory, Time To Turn It Into A Usable Buffer
-        buffer = createBufferFromWave(data,header);
-        if (!buffer){
-            free(data);
-            return -1;
-        }
+    // Create audio bufferBackground
+    ALuint bufferBackground, bufferSound1, bufferSound2;
+    createBufferForWav(env,&bufferBackground,backgroundSound);
+    createBufferForWav(env,&bufferSound1,sound1);
 
-    } else {
-        return -1;
-    }
+    // Create sourceBackground from bufferBackground and play it
+    ALuint sourceBackground = 0;
+    alGenSources(1, &sourceBackground );
+    alSourcei(sourceBackground, AL_BUFFER, bufferBackground);
 
-    // Create source from buffer and play it
-    ALuint source = 0;
-    alGenSources(1, &source );
-    alSourcei(source, AL_BUFFER, buffer);
+    ALuint sourceSound1 = 0;
+    alGenSources(1, &sourceSound1 );
+    alSourcei(sourceSound1, AL_BUFFER, bufferSound1);
 
-    // Play source
-    alSourcePlay(source);
+    // Play sourceBackground
+    alSourcePlay(sourceBackground);
+    alSourcePlay(sourceSound1);
 
     int        sourceState = AL_PLAYING;
     do {
-        alGetSourcei(source, AL_SOURCE_STATE, &sourceState);
+        alGetSourcei(sourceBackground, AL_SOURCE_STATE, &sourceState);
     } while(sourceState == AL_PLAYING);
 
-    // Release source
-    alDeleteSources(1, &source);
+    // Release sourceBackground
+    alDeleteSources(1, &sourceBackground);
+    alDeleteSources(1, &sourceSound1);
 
-    // Release audio buffer
-    alDeleteBuffers(1, &buffer);
+    // Release audio bufferBackground
+    alDeleteBuffers(1, &bufferBackground);
+    alDeleteBuffers(1, &bufferSound1);
 
     // Cleaning up
     //alcMakeContextCurrent(0);

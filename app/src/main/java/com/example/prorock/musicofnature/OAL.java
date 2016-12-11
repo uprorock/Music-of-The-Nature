@@ -12,5 +12,5 @@ public class OAL {
 
     }
     public native String stringFromJNI();
-    public native int play(String filename);
+    public native int play(String backgroundSound, String sound1, String sound2);
 }

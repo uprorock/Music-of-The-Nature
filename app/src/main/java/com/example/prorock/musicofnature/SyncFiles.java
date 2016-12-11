@@ -82,9 +82,9 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
                                              String remoteFolderName) throws IOException {
         if (ftpFileList != null && ftpFileList.length > 0) {
             for (FTPFile ftpfile : ftpFileList) {
-                if (ftpfile.isFile()) { // TODO: Проверять еще нужно на наличие файла И
-                                        // TODO: на его совпадение с версией на сервере
-                                        // TODO: И на то, если файл удален на сервере но есть на карте
+                if (ftpfile.isFile()) { /* TODO: Проверять еще нужно на наличие файла и
+                                           на его совпадение с версией на сервере,
+                                           и на то, если файл удален на сервере но есть на карте */
                     FileOutputStream output;
                     File targetFile = new File(localFolderPath + File.separator + ftpfile.getName());
                     output = new FileOutputStream(targetFile);
