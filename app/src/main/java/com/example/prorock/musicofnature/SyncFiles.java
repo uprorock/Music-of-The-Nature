@@ -27,10 +27,12 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
     private boolean isConnectedToFTP = false;
     private boolean isSyncedCorrectly = false;
     private Context mainContext;
+    String localFolderPath = null;
 
 
-    SyncFiles(Context appContext) {
+    SyncFiles(Context appContext, String localFolder) {
         mainContext = appContext;
+        localFolderPath = localFolder;
     }
 
     private void connectToFTP() throws IOException {
@@ -44,16 +46,6 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
         }
         else
             throw new IOException();
-    }
-
-    private String getLocalFolderPath() {
-        String sdState = android.os.Environment.getExternalStorageState(); //Получаем состояние SD карты (подключена она или нет)
-        if (sdState.equals(android.os.Environment.MEDIA_MOUNTED)) {
-            return Environment.getExternalStorageDirectory().toString();
-        }
-        else {
-            return mainContext.getFilesDir().toString();
-        }
     }
 
     private void SyncLocalFolderToFTP(String localFolderPath) throws IOException {
@@ -75,7 +67,6 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
             compareLocalWithRemoteFiles(connectionFTP.listFiles(remoteDir.getName()),
                     localFolderPath + File.separator + remoteDir.getName(), remoteDir.getName());
         }
-
         isSyncedCorrectly = true;
     }
 
@@ -102,7 +93,6 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
                 }
             }
         }
-
         //Checking files count on local and remote dirs
         File[] localFileList = new File(localFolderPath).listFiles();
         compareFilesCount(localFileList, ftpFileList);
@@ -143,10 +133,9 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
         connectionFTP = new FTPClient();
         try {
             connectToFTP();
-            String localFolderPath = getLocalFolderPath() + File.separator + "NatureMusic";
             SyncLocalFolderToFTP(localFolderPath);
-        } catch (Exception e) {
-            return null;
+        } catch (IOException e) {
+            isSyncedCorrectly = false;
         }
         return null;
     }

@@ -36,14 +36,4 @@
         android:onClick="onPlayButtonClicked"
         android:id="@+id/button_play" />
 
-    <Button
-        android:text="STOP"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button_play"
-        android:layout_alignLeft="@+id/button_play"
-        android:layout_alignStart="@+id/button_play"
-        android:layout_marginTop="10dp"
-        android:onClick="onStopButtonClicked"
-        android:id="@+id/button_stop" />
 </RelativeLayout>

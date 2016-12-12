@@ -10,10 +10,20 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-//TODO: Спросить разрешения при первом запуске и проверять в каждом запуске
-//TODO: Синхронизация должна осуществляться при первом запуске
-//TODO: Перед воспроизведенем проверять наличие файлов
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
+
+//TODO: Прогресс диалог на время синхронизации?
+//TODO: Локализация
+//TODO: Добавить активити с информацией о приложении и авторе
+//TODO: Горизонтальная ориентация
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,80 +31,32 @@ public class MainActivity extends AppCompatActivity {
     Button syncButton;
     Button playButton;
     TextView tv;
-    int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 0;
-    int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
-    int MY_PERMISSIONS_REQUEST_INTERNET = 0;
-
-    // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("openal");
-    }
+    String localFolderPath;
+    static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 0;
+    static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
+    boolean musicPlaying = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        requestPermissions();
         syncButton = (Button)findViewById(R.id.button_sync);
         playButton = (Button)findViewById(R.id.button_play);
         tv = (TextView) findViewById(R.id.sample_text);
-
-        // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,
-                Manifest.permission.INTERNET)
-                != PackageManager.PERMISSION_GRANTED
-                ) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.INTERNET},
-                    MY_PERMISSIONS_REQUEST_INTERNET);
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-
-        }
-
-/*
-        test = new OAL();
-        String extStore = Environment.getExternalStorageDirectory().getAbsolutePath();
-
-        String filePath = Environment.getExternalStorageDirectory().toString() + "/NatureMusic/Sounds/bird.wav";
-        MediaPlayer mp = MediaPlayer.create(this, Uri.parse(filePath));
-        mp.start();
-
-
-        File[] externalStorage = getExternalFilesDirs(null);
-
-        String path = externalStorage[1].getPath().toString();
-        Log.d("Files", "Path: " + path);
-        File directory = new File(path);
-        File[] files = directory.listFiles();
-        Log.d("Files", "Size: "+ files.length);
-        for (int i = 0; i < files.length; i++)
-        {
-            Log.d("Files", "FileName:" + files[i].getName());
-        }
-
-        String filePath = Environment.getExternalStorageDirectory().toString() + "/EarthQuake.wav";
-        int indicator = test.play(filePath);
-        // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.sample_text);
-         tv.setText(test.stringFromJNI());
-*/
+        localFolderPath = getLocalFolderPath() + File.separator + "NatureMusic";
     }
 
     public void onSyncButtonClicked(View v) {
-        new SyncFiles(this).execute();
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED)
+            new SyncFiles(this, localFolderPath).execute();
+        else
+            Toast.makeText(getApplicationContext(), "You need to give permissions, restart app!", Toast.LENGTH_SHORT).show();
     }
 
     public void onStopButtonClicked(View v) {
@@ -104,27 +66,86 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onPlayButtonClicked(View v) {
-        /*
-        String filePath = Environment.getExternalStorageDirectory().toString() + "/NatureMusic/Sounds/bird.wav";
-        MediaPlayer mp = MediaPlayer.create(this, Uri.parse(filePath));
-        mp.start();
-        */
-        //test = new OAL();
-        String filePath = Environment.getExternalStorageDirectory().toString() + "/NatureMusic/Sounds/bird_chirp.wav";
-        String filePath2 = Environment.getExternalStorageDirectory().toString() + "/NatureMusic/Backgrounds/bird.wav";
-        //int indicator = test.play(filePath2, filePath, null);
-
-        asyncOAL = new OAL(filePath2, filePath, null);
-        asyncOAL.execute();
+        if (!musicPlaying) {
+            String[] filePath = pickRandomSounds();
+            if (filePath != null) {
+                //int indicator = test.play(filePath2, filePath, null);
+                if (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    playButton.setText("STOP");
+                    musicPlaying = true;
+                    asyncOAL = new OAL(filePath[0], filePath[1], filePath[2]);
+                    asyncOAL.execute();
+                } else
+                    Toast.makeText(getApplicationContext(), "You need to give permissions, restart app!", Toast.LENGTH_SHORT).show();
+            }
+            else
+                Toast.makeText(getApplicationContext(), "There is no sound files, synchronize!", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            new OAL(null,null,null).execute();
+            playButton.setText("PLAY");
+            musicPlaying = false;
+        }
 
     }
 
 
     private void requestPermissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
 
     }
 
-    private void pickRandomSounds() {
+    private String getLocalFolderPath() {
+        String sdState = android.os.Environment.getExternalStorageState(); //Получаем состояние SD карты (подключена она или нет)
+        if (sdState.equals(android.os.Environment.MEDIA_MOUNTED)) {
+            return Environment.getExternalStorageDirectory().toString();
+        }
+        else {
+            return getApplicationContext().getFilesDir().toString();
+        }
+    }
 
+    private String[] pickRandomSounds() {
+        File background = new File(localFolderPath + File.separator + "Backgrounds");
+        File sounds = new File(localFolderPath + File.separator + "Sounds");
+
+        if (background.exists() && sounds.exists()) {
+            String[] backgroundsFiles = background.list();
+            String[] soundFiles = sounds.list();
+
+            List<String> soundsList = pickNRandom(Arrays.asList(soundFiles), 2);
+            List<String> backgroundsList = pickNRandom(Arrays.asList(backgroundsFiles), 1);
+
+            String[] filePath = new String[3];
+            filePath[0] = localFolderPath + File.separator + "Backgrounds" + File.separator + backgroundsList.get(0);
+            filePath[1] = localFolderPath + File.separator + "Sounds" + File.separator + soundsList.get(0);
+            filePath[2] = localFolderPath + File.separator + "Sounds" + File.separator + soundsList.get(1);
+
+            return filePath;
+        }
+        else
+            return null;
+    }
+
+    private List<String> pickNRandom(List<String> lst, int n) {
+        List<String> copy = new LinkedList<String>(lst);
+        Collections.shuffle(copy);
+        return copy.subList(0, n);
     }
 }

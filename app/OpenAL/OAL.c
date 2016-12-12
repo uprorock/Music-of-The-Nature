@@ -10,7 +10,7 @@
 #include <AL/alc.h>
 #include <unistd.h>
 
-jboolean isCancelled = 0;
+//jboolean isCancelled = 0;
 ALuint sourceBackground, sourceSound1, sourceSound2;
 ALuint bufferBackground, bufferSound1, bufferSound2;
 
@@ -111,7 +111,7 @@ JNIEXPORT jint JNICALL
 Java_com_example_prorock_musicofnature_OAL_play(JNIEnv *env, jobject instance, jstring backgroundSound,
                                                 jstring sound1, jstring sound2) {
 
-    isCancelled = 0;
+    //isCancelled = 0;
     // Global Variables
     ALCdevice* device = 0;
     ALCcontext* context = 0;
@@ -126,6 +126,7 @@ Java_com_example_prorock_musicofnature_OAL_play(JNIEnv *env, jobject instance, j
 
     createBufferForWav(env,&bufferBackground,backgroundSound);
     createBufferForWav(env,&bufferSound1,sound1);
+    createBufferForWav(env,&bufferSound2,sound2);
 
     // Create sourceBackground from bufferBackground and play it
     sourceBackground = 0;
@@ -135,12 +136,18 @@ Java_com_example_prorock_musicofnature_OAL_play(JNIEnv *env, jobject instance, j
 
     sourceSound1 = 0;
     alGenSources(1, &sourceSound1 );
+    alSourcei(sourceSound1, AL_LOOPING, 1);
     alSourcei(sourceSound1, AL_BUFFER, bufferSound1);
+
+    sourceSound2 = 0;
+    alGenSources(1, &sourceSound2 );
+    alSourcei(sourceSound2, AL_LOOPING, 1);
+    alSourcei(sourceSound2, AL_BUFFER, bufferSound2);
 
     // Play sourceBackground
     alSourcePlay(sourceBackground);
     alSourcePlay(sourceSound1);
-
+    alSourcePlay(sourceSound2);
 
 
     // Release sourceBackground
@@ -164,15 +171,22 @@ JNIEXPORT jint JNICALL
 Java_com_example_prorock_musicofnature_OAL_stop(JNIEnv *env, jobject instance) {
 
     alSourcei(sourceBackground, AL_LOOPING, 0);
+    alSourcei(sourceSound1, AL_LOOPING, 0);
+    alSourcei(sourceSound2, AL_LOOPING, 0);
+
     alSourceStop(sourceBackground);
     alSourceStop(sourceSound1);
+    alSourceStop(sourceSound2);
+
     // Release sourceBackground
     alDeleteSources(1, &sourceBackground);
     alDeleteSources(1, &sourceSound1);
+    alDeleteSources(1, &sourceSound2);
 
     // Release audio bufferBackground
     alDeleteBuffers(1, &bufferBackground);
     alDeleteBuffers(1, &bufferSound1);
+    alDeleteBuffers(1, &bufferSound2);
 
     return 0;
 }
