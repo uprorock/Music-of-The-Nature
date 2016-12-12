@@ -1,12 +1,16 @@
 package com.example.prorock.musicofnature;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -19,10 +23,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-
-//TODO: Прогресс диалог на время синхронизации?
-//TODO: Добавить меню с пунктами "об авторе" и "синхронизировать"
-//TODO: Добавить активити с информацией о приложении и авторе
 //TODO: Горизонтальная ориентация (сохранение состояния при повороте)
 
 public class MainActivity extends AppCompatActivity {
@@ -36,19 +36,55 @@ public class MainActivity extends AppCompatActivity {
     static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
     boolean musicPlaying = false;
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("musicPlaying", musicPlaying);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        musicPlaying = savedInstanceState.getBoolean("musicPlaying");
+        if (!musicPlaying)
+            playButton.setText(R.string.button_play);
+        else
+            playButton.setText(R.string.button_stop);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id) {
+            case R.id.menu_sync:
+                onSyncClicked();
+                return true;
+            case R.id.menu_about:
+                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         requestPermissions();
-        syncButton = (Button)findViewById(R.id.button_sync);
         playButton = (Button)findViewById(R.id.button_play);
         tv = (TextView) findViewById(R.id.sample_text);
         localFolderPath = getLocalFolderPath() + File.separator + "NatureMusic";
     }
 
-    public void onSyncButtonClicked(View v) {
+    public void onSyncClicked() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this,

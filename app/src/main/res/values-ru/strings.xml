@@ -8,4 +8,6 @@
     <string name="toast_synccomplete">Синхронизация завершена успешно!</string>
     <string name="toast_syncerror">Ошибка, синхронизация прервана!</string>
     <string name="toast_servererror">Не удалось подключиться к серверу!</string>
+    <string name="toast_waitforsync">Синхронизация, подождите...</string>
+    <string name="text_about">Григорьев Илья, М091501(72), Звуковой ландшафт</string>
 </resources>

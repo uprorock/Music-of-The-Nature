@@ -1,6 +1,7 @@
 package com.example.prorock.musicofnature;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -28,7 +29,15 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
     private boolean isSyncedCorrectly = false;
     private Context mainContext;
     String localFolderPath = null;
+    private ProgressDialog progress = null;
 
+
+    @Override
+    protected void onPreExecute() {
+        progress = ProgressDialog.show(mainContext, null,
+                mainContext.getString(R.string.toast_waitforsync));
+        super.onPreExecute();
+    }
 
     SyncFiles(Context appContext, String localFolder) {
         mainContext = appContext;
@@ -142,6 +151,7 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        progress.dismiss();
         if (!isSyncedCorrectly)
             Toast.makeText(mainContext, R.string.toast_syncerror, Toast.LENGTH_SHORT).show();
         else if (!isConnectedToFTP)

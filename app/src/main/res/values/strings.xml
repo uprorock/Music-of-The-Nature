@@ -10,4 +10,6 @@
     <string name="toast_synccomplete">Sync complete!</string>
     <string name="toast_syncerror">Synchronization error!</string>
     <string name="toast_servererror">Can\'t connect to remote Server!</string>
+    <string name="toast_waitforsync">Synchronizing...</string>
+    <string name="text_about">Grigoryev Ilya, M091501(72), Soundscape</string>
 </resources>
