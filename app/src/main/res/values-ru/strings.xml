@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_sync">Синхронизировать</string>
+    <string name="menu_about">О программе</string>
+    <string name="toast_permissions">Вам нужно дать приложению разрешения, перезапустите приложение!</string>
+    <string name="toast_nofilesfound">Нет звуковых файлов, выполните синхронизацию!</string>
+    <string name="text_welcome">Добро пожаловать! Синхронизируйте Ваши звуковые файлы с удаленным FTP сервером и нажмите PLAY!</string>
+    <string name="toast_synccomplete">Синхронизация завершена успешно!</string>
+    <string name="toast_syncerror">Ошибка, синхронизация прервана!</string>
+    <string name="toast_servererror">Не удалось подключиться к серверу!</string>
+</resources>

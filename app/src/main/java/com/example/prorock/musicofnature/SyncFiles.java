@@ -36,7 +36,6 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
     }
 
     private void connectToFTP() throws IOException {
-        //TODO: Exception on login
         connectionFTP.connect(serverFTPaddress, 21);
         if (connectionFTP.login(loginFTPServer, passwordFTPServer))
             {
@@ -144,10 +143,10 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         if (!isSyncedCorrectly)
-            Toast.makeText(mainContext, "Error with syncing!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mainContext, R.string.toast_syncerror, Toast.LENGTH_SHORT).show();
         else if (!isConnectedToFTP)
-            Toast.makeText(mainContext, "Error with connecting to server!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mainContext, R.string.toast_servererror, Toast.LENGTH_SHORT).show();
         else
-            Toast.makeText(mainContext, "Sync complete!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mainContext, R.string.toast_synccomplete, Toast.LENGTH_SHORT).show();
     }
 }

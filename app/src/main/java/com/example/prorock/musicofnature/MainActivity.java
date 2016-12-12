@@ -21,9 +21,9 @@ import java.util.Random;
 
 
 //TODO: Прогресс диалог на время синхронизации?
-//TODO: Локализация
+//TODO: Добавить меню с пунктами "об авторе" и "синхронизировать"
 //TODO: Добавить активити с информацией о приложении и авторе
-//TODO: Горизонтальная ориентация
+//TODO: Горизонтальная ориентация (сохранение состояния при повороте)
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,13 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 == PackageManager.PERMISSION_GRANTED)
             new SyncFiles(this, localFolderPath).execute();
         else
-            Toast.makeText(getApplicationContext(), "You need to give permissions, restart app!", Toast.LENGTH_SHORT).show();
-    }
-
-    public void onStopButtonClicked(View v) {
-        //asyncOAL.cancel(true);
-        new OAL(null,null,null).execute();
-        tv.setText("CANCELED");
+            Toast.makeText(getApplicationContext(), R.string.toast_permissions, Toast.LENGTH_SHORT).show();
     }
 
     public void onPlayButtonClicked(View v) {
@@ -75,19 +69,19 @@ public class MainActivity extends AppCompatActivity {
                         == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         == PackageManager.PERMISSION_GRANTED) {
-                    playButton.setText("STOP");
+                    playButton.setText(R.string.button_stop);
                     musicPlaying = true;
                     asyncOAL = new OAL(filePath[0], filePath[1], filePath[2]);
                     asyncOAL.execute();
                 } else
-                    Toast.makeText(getApplicationContext(), "You need to give permissions, restart app!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.toast_permissions, Toast.LENGTH_SHORT).show();
             }
             else
-                Toast.makeText(getApplicationContext(), "There is no sound files, synchronize!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.toast_nofilesfound, Toast.LENGTH_SHORT).show();
         }
         else {
             new OAL(null,null,null).execute();
-            playButton.setText("PLAY");
+            playButton.setText(R.string.button_play);
             musicPlaying = false;
         }
 
