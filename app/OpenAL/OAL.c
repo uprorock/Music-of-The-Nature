@@ -4,23 +4,13 @@
 
 #include <jni.h>
 #include <stdio.h>
-#include <stddef.h>
 #include <string.h>
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <unistd.h>
 
-//jboolean isCancelled = 0;
 ALuint sourceBackground, sourceSound1, sourceSound2;
 ALuint bufferBackground, bufferSound1, bufferSound2;
 
-
-JNIEXPORT jstring JNICALL
-Java_com_example_prorock_musicofnature_OAL_stringFromJNI
-        (JNIEnv *env, jobject instance) {
-
-    return (*env)->NewStringUTF(env, "HELLO !!");
-}
 
 typedef struct {
     char  riff[4];//'RIFF'
@@ -111,7 +101,6 @@ JNIEXPORT jint JNICALL
 Java_com_example_prorock_musicofnature_OAL_play(JNIEnv *env, jobject instance, jstring backgroundSound,
                                                 jstring sound1, jstring sound2) {
 
-    //isCancelled = 0;
     // Global Variables
     ALCdevice* device = 0;
     ALCcontext* context = 0;
@@ -149,22 +138,7 @@ Java_com_example_prorock_musicofnature_OAL_play(JNIEnv *env, jobject instance, j
     alSourcePlay(sourceSound1);
     alSourcePlay(sourceSound2);
 
-
-    // Release sourceBackground
-    //alDeleteSources(1, &sourceBackground);
-    //alDeleteSources(1, &sourceSound1);
-
-    // Release audio bufferBackground
-    //alDeleteBuffers(1, &bufferBackground);
-    //alDeleteBuffers(1, &bufferSound1);
-
-    // Cleaning up
-    //alcMakeContextCurrent(0);
-    //alcDestroyContext(context);
-    //alcCloseDevice(device);
-
     return 0;
-
 }
 
 JNIEXPORT jint JNICALL

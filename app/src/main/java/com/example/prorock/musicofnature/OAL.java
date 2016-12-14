@@ -4,10 +4,6 @@ import android.os.AsyncTask;
 
 import static java.lang.System.loadLibrary;
 
-/**
- * Created by ProRock on 22.11.2016.
- */
-
 public class OAL extends AsyncTask<Void,Void,Void> {
     static {
         loadLibrary("openal");
@@ -15,7 +11,6 @@ public class OAL extends AsyncTask<Void,Void,Void> {
     }
 
     String backgroundSound = null, sound1 = null, sound2 = null;
-    public native String stringFromJNI();
     public native int play(String backgroundSound, String sound1, String sound2);
     public native int stop();
 

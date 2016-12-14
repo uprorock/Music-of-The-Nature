@@ -85,11 +85,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onSyncClicked() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED)
+        if (requestPermissions())
             new SyncFiles(this, localFolderPath).execute();
         else
             Toast.makeText(getApplicationContext(), R.string.toast_permissions, Toast.LENGTH_SHORT).show();
@@ -97,11 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPlayButtonClicked(View v) {
         if (!musicPlaying) {
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
+            if (requestPermissions()) {
                 String[] filePath = pickRandomSounds();
                 if (filePath != null) {
                     //int indicator = test.play(filePath2, filePath, null);
@@ -120,25 +112,31 @@ public class MainActivity extends AppCompatActivity {
             playButton.setText(R.string.button_play);
             musicPlaying = false;
         }
-
     }
 
 
-    private void requestPermissions() {
+    private boolean requestPermissions() {
+        boolean perm;
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED)
+                != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+        }
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED)
+                != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+            perm = false;
+        }
+        else
+            perm = true;
 
+        return perm;
     }
 
     private String getLocalFolderPath() {

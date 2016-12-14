@@ -66,11 +66,10 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
 
         FTPFile[] ftpFileList = connectionFTP.listFiles();
         File[] localFileList = coreDir.listFiles();
-        // Проверяем и создаем корневые папки
+        // Check and create dirs
         compareLocalWithRemoteFolders(localFolderPath, localFileList, ftpFileList);
 
-        // Проходим по каждой папке
-        //connectionFTP.setFileType(FTPClient.BINARY_FILE_TYPE);
+        // Check files in concrete dir
         for (FTPFile remoteDir : ftpFileList) {
             compareLocalWithRemoteFiles(connectionFTP.listFiles(remoteDir.getName()),
                     localFolderPath + File.separator + remoteDir.getName(), remoteDir.getName());
@@ -101,7 +100,6 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
                 }
             }
         }
-        //Checking files count on local and remote dirs
         File[] localFileList = new File(localFolderPath).listFiles();
         compareFilesCount(localFileList, ftpFileList);
     }
@@ -116,10 +114,11 @@ class SyncFiles extends AsyncTask<Void, Void, Void> {
                 }
             }
         }
-        // Checking folders count on local and remote dirs
         compareFilesCount(localFoldersList, ftpFoldersList);
     }
 
+    // Checking folders count on local and remote dirs
+    // Needs for deleting extent files
     private void compareFilesCount(File[] localFileList, FTPFile[] ftpFileList) {
         if (ftpFileList.length != localFileList.length) {
             for (File localFile : localFileList) {
