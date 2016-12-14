@@ -97,23 +97,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPlayButtonClicked(View v) {
         if (!musicPlaying) {
-            String[] filePath = pickRandomSounds();
-            if (filePath != null) {
-                //int indicator = test.play(filePath2, filePath, null);
-                if (ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    playButton.setText(R.string.button_stop);
-                    musicPlaying = true;
-                    asyncOAL = new OAL(filePath[0], filePath[1], filePath[2]);
-                    asyncOAL.execute();
-                } else
-                    Toast.makeText(getApplicationContext(), R.string.toast_permissions, Toast.LENGTH_SHORT).show();
-            }
-            else
-                Toast.makeText(getApplicationContext(), R.string.toast_nofilesfound, Toast.LENGTH_SHORT).show();
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                String[] filePath = pickRandomSounds();
+                if (filePath != null) {
+                    //int indicator = test.play(filePath2, filePath, null);
+                        playButton.setText(R.string.button_stop);
+                        musicPlaying = true;
+                        asyncOAL = new OAL(filePath[0], filePath[1], filePath[2]);
+                        asyncOAL.execute();
+                }
+                else
+                    Toast.makeText(getApplicationContext(), R.string.toast_nofilesfound, Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(getApplicationContext(), R.string.toast_permissions, Toast.LENGTH_SHORT).show();
         }
         else {
             new OAL(null,null,null).execute();
